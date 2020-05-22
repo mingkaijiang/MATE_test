@@ -4,24 +4,24 @@ RMATE2 <- function(matefile = "input/RMATE2.xls",
                    nrows=NA, ...){
     
     #::::: Read parameters, assign.
-    MATEpars <- read.xls(matefile,
-                         sheet="Parameters")
-    
-    MATEpars <- as.data.frame(MATEpars[,2:3])
-    names(MATEpars) <- c("parname", "parvalue")
-    
-    # Note that none of the parameters can be text!
-    MATEpars$parvalue <- as.numeric(as.character(MATEpars$parvalue))
-    
-    # missing values are labels
-    MATEpars <- na.omit(MATEpars)
-    
-    # Assign parameters from file
-    for(i in 1:nrow(MATEpars))assign(as.character(MATEpars[i,1]),MATEpars[i,2])
-    
-    # Assign additional parameters:
-    l <- list(...)
-    if(length(l) > 0)for(j in 1:length(l))assign(names(l)[j],l[[j]])
+    #MATEpars <- read.xls(matefile,
+    #                     sheet="Parameters")
+    #
+    #MATEpars <- as.data.frame(MATEpars[,2:3])
+    #names(MATEpars) <- c("parname", "parvalue")
+    #
+    ## Note that none of the parameters can be text!
+    #MATEpars$parvalue <- as.numeric(as.character(MATEpars$parvalue))
+    #
+    ## missing values are labels
+    #MATEpars <- na.omit(MATEpars)
+    #
+    ## Assign parameters from file
+    #for(i in 1:nrow(MATEpars))assign(as.character(MATEpars[i,1]),MATEpars[i,2])
+    #
+    ## Assign additional parameters:
+    #l <- list(...)
+    #if(length(l) > 0)for(j in 1:length(l))assign(names(l)[j],l[[j]])
     
     #::::: Read daily data
     MATEdailydata <- read.xls(matefile, sheet="DailyData", skip=4, header=F)

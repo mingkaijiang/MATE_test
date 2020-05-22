@@ -8,7 +8,7 @@ OptimW <- 0.0
 OptimV <- 0.0
 Rfmult <- 1.0
 Ca <- 360
-APAR <- NA
+#APAR <- NA
 LAIcover <- 0.5
 Kext <- 0.5
 LAI2 <- 0.0
@@ -16,17 +16,16 @@ Latitude <- -35
 Kext2 <- 0.5
 
 #### Light use efficiency and NPP
-LUEmax <- NA
-Fco2 <- NA
+#LUEmax <- NA
+#Fco2 <- NA
 Cfracts <- 0.48
 Alpha <- 0.05
-Vcmax <- 82.0
-Jmax <- 191.0
+Vcmax25 <- 82.0
+Jmax25 <- 191.0
 mateoption <- 0.0
 Theta <- 0.7
-CiCa <- NA
+CiCa <- 0.8
 CUE <- 0.5
-Cfracts <- NA
 Gsmax <- 400.0
 EaV <- 51560
 EaJ <- 43790
@@ -52,7 +51,7 @@ b <- 2.79
 phiLmax <- -1.4
 phiLmin <- -4.0
 ksr <- 4.0
-Watermin <- NA
+#Watermin <- NA
 WUE0 <- 4.0
 Wetloss <- 0.5
 Albedo <- 0.2
@@ -79,7 +78,7 @@ Height1 <- 30.0
 Allocsensf <- 0.5
 Siginit <- 5.09434
 Signew <- 7.085
-FormFactor <- 1.0
+#FormFactor <- 1.0
 
 ## Branch / stem allocation (trees)
 Callocb <- 0.42
