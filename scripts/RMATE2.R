@@ -1,43 +1,13 @@
-RMATE2 <- function(matefile = "input/RMATE2.xls", 
+RMATE2 <- function(matefile = "input/RMATE2.csv", 
                    outputfile = "output/RMATE2output.csv",
                    runfrom=1, 
                    nrows=NA, ...){
     
-    #::::: Read parameters, assign.
-    #MATEpars <- read.xls(matefile,
-    #                     sheet="Parameters")
-    #
-    #MATEpars <- as.data.frame(MATEpars[,2:3])
-    #names(MATEpars) <- c("parname", "parvalue")
-    #
-    ## Note that none of the parameters can be text!
-    #MATEpars$parvalue <- as.numeric(as.character(MATEpars$parvalue))
-    #
-    ## missing values are labels
-    #MATEpars <- na.omit(MATEpars)
-    #
-    ## Assign parameters from file
-    #for(i in 1:nrow(MATEpars))assign(as.character(MATEpars[i,1]),MATEpars[i,2])
-    #
-    ## Assign additional parameters:
-    #l <- list(...)
-    #if(length(l) > 0)for(j in 1:length(l))assign(names(l)[j],l[[j]])
-    
     #::::: Read daily data
-    MATEdailydata <- read.xls(matefile, sheet="DailyData", skip=4, header=F)
-    #headers <- read.xls(matefile, sheet="DailyData", skip=2, header=F)[1,]
-    #headers <- as.character(as.data.frame(headers))
-    #headers[1] <- "Date"
-    
-    names(MATEdailydata) <- c("Date", "RecordNo", "DOY", "Radtot", "VPDav", "Tmax",
-                              "Tmin", "Precip", "LAI", "StemC", "SoilWater", "TopSoilWater",
-                              "NetRadn", "WaterFlux", "Cflux", "WUE", "Declin", "Daylen", "Tam",
-                              "Tpm", "Tav", "Dam", "Dpm", "Dav", "GamstarAM", "GamstarPM",
-                              "KmAM", "KmPM", "JmAM", "JmPM", "VmAM", "VmPM", "Unknown1",
-                              "Date2", "Unkown2", "Unknown3", "Unknown4", "Unknown5", "Unknown6")
+    MATEdailydata <- read.csv(matefile)
     
     # Convert Excel type date to a normal date string.
-    MATEdailydata$Date <- as.Date(as.character(MATEdailydata$Date))
+    MATEdailydata$Date <- as.Date(as.character(MATEdailydata$Date), format="%d/%m/%y")
     
     # Start at 'runfrom', toss previous met data
     MATEdailydata <- MATEdailydata[runfrom:nrow(MATEdailydata),]
@@ -159,10 +129,10 @@ RMATE2 <- function(matefile = "input/RMATE2.xls",
             Gsam[i] <- Gsmax*fPAWam[i]*fVPDam[i]/1000
             Gspm[i] <- Gsmax*fPAWpm[i]*fVPDpm[i]/1000
             
-            AcAM[i] <- SolveQuad(Gsam[i]/1.6,DD$VmAM[i],Ca,DD$GamStarAM[i],DD$KmAM[i])		
-            AcPM[i] <- SolveQuad(Gspm[i]/1.6,DD$VmPM[i],Ca,DD$GamStarPM[i],DD$KmPM[i])
-            AjAM[i] <- SolveQuad(Gsam[i]/1.6,DD$JmAM[i]/4,Ca,DD$GamStarAM[i],2*DD$GamStarAM[i])
-            AjPM[i] <- SolveQuad(Gspm[i]/1.6,DD$JmPM[i]/4,Ca,DD$GamStarPM[i],2*DD$GamStarPM[i])
+            AcAM[i] <- SolveQuad(Gsam[i]/1.6,DD$VmAM[i],DD$Ca[i],DD$GamStarAM[i],DD$KmAM[i])		
+            AcPM[i] <- SolveQuad(Gspm[i]/1.6,DD$VmPM[i],DD$Ca[i],DD$GamStarPM[i],DD$KmPM[i])
+            AjAM[i] <- SolveQuad(Gsam[i]/1.6,DD$JmAM[i]/4,DD$Ca[i],DD$GamStarAM[i],2*DD$GamStarAM[i])
+            AjPM[i] <- SolveQuad(Gspm[i]/1.6,DD$JmPM[i]/4,DD$Ca[i],DD$GamStarPM[i],2*DD$GamStarPM[i])
             
             AsatAM[i] <- ifelse(Gsam[i]==0, 0, min(AjAM[i], AcAM[i]))
             AsatPM[i] <- ifelse(Gspm[i]==0, 0, min(AjPM[i], AcPM[i]))
@@ -181,22 +151,22 @@ RMATE2 <- function(matefile = "input/RMATE2.xls",
             
             # Different options for ci/ca model.
             if(cicamodel==1){
-                CiCaAM[i] <- CiDivCa(Ca,Gamma,m[i],DD$VPDam[i],LeuningDo)
-                CiCaPM[i] <- CiDivCa(Ca,Gamma,m[i],DD$VPDpm[i],LeuningDo)
+                CiCaAM[i] <- CiDivCa(DD$Ca[i],Gamma,m[i],DD$VPDam[i],LeuningDo)
+                CiCaPM[i] <- CiDivCa(DD$Ca[i],Gamma,m[i],DD$VPDpm[i],LeuningDo)
             }
             if(cicamodel==2){
-                CiCaAM[i] <- 1-sqrt((1.6*(DD$VPDam[i]/101) * (Ca-optimlambda) )/(optimlambda*Ca^2))
-                CiCaPM[i] <- 1-sqrt((1.6*(DD$VPDpm[i]/101) * (Ca-optimlambda) )/(optimlambda*Ca^2))
+                CiCaAM[i] <- 1-sqrt((1.6*(DD$VPDam[i]/101) * (DD$Ca[i]-optimlambda) )/(optimlambda*DD$Ca[i]^2))
+                CiCaPM[i] <- 1-sqrt((1.6*(DD$VPDpm[i]/101) * (DD$Ca[i]-optimlambda) )/(optimlambda*DD$Ca[i]^2))
             }
             CiCaAv[i] <- (CiCaAM[i] + CiCaPM[i])/2
             
             # Vcmax limited assimilation rate
-            AcAM[i] <- max(0,(Ca*CiCaAM[i] - DD$GamStarAM[i]))/(Ca*CiCaAM[i]+ DD$KmAM[i])*DD$VmAM[i]
-            AcPM[i] <- max(0,(Ca*CiCaPM[i] - DD$GamStarPM[i]))/(Ca*CiCaPM[i]+ DD$KmPM[i])*DD$VmPM[i]
+            AcAM[i] <- max(0,(DD$Ca[i]*CiCaAM[i] - DD$GamStarAM[i]))/(DD$Ca[i]*CiCaAM[i]+ DD$KmAM[i])*DD$VmAM[i]
+            AcPM[i] <- max(0,(DD$Ca[i]*CiCaPM[i] - DD$GamStarPM[i]))/(DD$Ca[i]*CiCaPM[i]+ DD$KmPM[i])*DD$VmPM[i]
             
             # Jmax limited (at light saturation)
-            AjAM[i] <- (DD$JmAM[i]/4) * ((Ca*CiCaAM[i] - DD$GamStarAM[i])/(Ca*CiCaAM[i] + 2*DD$GamStarAM[i]))
-            AjPM[i] <- (DD$JmPM[i]/4) * ((Ca*CiCaPM[i] - DD$GamStarPM[i])/(Ca*CiCaPM[i] + 2*DD$GamStarPM[i]))
+            AjAM[i] <- (DD$JmAM[i]/4) * ((DD$Ca[i]*CiCaAM[i] - DD$GamStarAM[i])/(DD$Ca[i]*CiCaAM[i] + 2*DD$GamStarAM[i]))
+            AjPM[i] <- (DD$JmPM[i]/4) * ((DD$Ca[i]*CiCaPM[i] - DD$GamStarPM[i])/(DD$Ca[i]*CiCaPM[i] + 2*DD$GamStarPM[i]))
             
             # Note that these are gross photosynthetic rates.
             AsatAM[i] <- min(AjAM[i], AcAM[i])
@@ -258,11 +228,11 @@ RMATE2 <- function(matefile = "input/RMATE2.xls",
         # ROSS-MATE	
         if(mateoption == 0){
             if(WUEmodel==1){
-                WUE[i] <- (12/18)*1000*(Ca*10^-6*(1-CiCaAv[i])/(1.6*DD$VPDav[i]/101))
+                WUE[i] <- (12/18)*1000*(DD$Ca[i]*10^-6*(1-CiCaAv[i])/(1.6*DD$VPDav[i]/101))
                 #if(WUE[i] > 20) WUE[i] <- 20    # FIX THIS!!!
             }
             if(WUEmodel==2){
-                WUE[i] <- WUE0*0.27273/DD$VPDav[i]*Ca/380
+                WUE[i] <- WUE0*0.27273/DD$VPDav[i]*DD$Ca[i]/380
             }
             
             Transp[i] <- NPPgCm2[i]/CUE/WUE[i]
@@ -354,20 +324,6 @@ RMATE2 <- function(matefile = "input/RMATE2.xls",
     write.table(returndfr, outputfile, sep=",", row.names=F)
     
     return(returndfr)
-    
-    # if(writetoxls){
-    
-    # datarecord <- 1:SIMROWS
-    # Time <- 0:(SIMROWS-1)
-    # w <- cbind(SimulateNPP$Date,datarecord,Time,SimulateNPP[,2:ncol(SimulateNPP)])
-    # write.xls(w,matefile,colNames=F,from=5,sheet="SimulateNPP")
-    
-    # w <- cbind(SimulateGrowth$Date,datarecord,Time,SimulateGrowth[,2:ncol(SimulateGrowth)])
-    # write.xls(w,matefile,colNames=F,from=5,sheet="SimulateGrowth")
-    
-    # w <- cbind(SimulateH2O$Date,datarecord,Time,SimulateH2O[,2:ncol(SimulateH2O)])
-    # write.xls(w,matefile,colNames=F,from=5,sheet="SimulateH2O")
-    # }
     
     options(warn=0)
 }
