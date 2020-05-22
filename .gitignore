@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # ignore everything in old folder
 /old/*
+
+# ignore output
+/output/*

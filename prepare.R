@@ -12,7 +12,9 @@ pacman::p_load(dplyr,
                ggplot2,
                viridis,
                scales,
-               data.table)    
+               data.table,
+               xlsReadWrite,
+               gdata)    
 
 
 #### Sourcing all R files in the modules subdirectory
