@@ -1,13 +1,12 @@
 #### prepare parameter settings
 
 #### Control parameters
-FixLAI <- 0.0
+FixLAI <- 0.0   ## 0 fix by input, 1 vary by carbon stock
 VPDData <- 1.0
 VPDUnits <- 2.0
 OptimW <- 0.0
 OptimV <- 0.0
 Rfmult <- 1.0
-#Ca <- 360
 #APAR <- NA
 LAIcover <- 0.5
 Kext <- 0.5

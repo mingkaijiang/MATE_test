@@ -1,7 +1,7 @@
-RMATE2 <- function(matefile = "input/RMATE2.csv", 
-                   outputfile = "output/RMATE2output.csv",
-                   runfrom=1, 
-                   nrows=NA, ...){
+RMATE2_WTC <- function(matefile, 
+                   outputfile,
+                   runfrom, 
+                   nrows){
     
     #::::: Read daily data
     MATEdailydata <- read.csv(matefile)

@@ -22,6 +22,12 @@ source("parameter/parameters.R")
 out <- RMATE2()
 
 
+### run code modified to accommodate WTC input data and parameters
+out <- RMATE2_WTC(matefile = "input/RMATE2.csv", 
+                  outputfile = "output/RMATE2output.csv",
+                  runfrom=1, 
+                  nrows=NA)
+
 
 #### run sensitivity test
 #rundfr <- expand.grid(#Ca=c(380,620), 
