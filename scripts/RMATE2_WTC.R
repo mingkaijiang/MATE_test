@@ -7,7 +7,7 @@ RMATE2_WTC <- function(matefile,
     MATEdailydata <- read.csv(matefile)
     
     # Convert Excel type date to a normal date string.
-    MATEdailydata$Date <- as.Date(as.character(MATEdailydata$Date), format="%m/%d/%y")
+    MATEdailydata$Date <- as.Date(as.character(MATEdailydata$Date), format="%Y-%m-%d")
     
     # Start at 'runfrom', toss previous met data
     MATEdailydata <- MATEdailydata[runfrom:nrow(MATEdailydata),]
@@ -272,7 +272,7 @@ RMATE2_WTC <- function(matefile,
                             fVPD, Gs, leafPsi, Aj, Ac, Asat, LUE,
                             LUE1000,LUEgCMJPAR,NPPtCha,NPPgCm2,CumNPP,CumAPAR,LAIgrass,Fabsgrass,
                             APARgrass,fPAWgrass,fVPDgrass,LUEgrass,NPPtChagrass,NPPgCm2grass,totalNPP,
-                            CumNPPgrass,CumtotalNPP,PAWcur,PAW1cur,soilPsi,TranspAM,TranspPM,Transp,Erain,epsil,
+                            CumNPPgrass,CumtotalNPP,PAWcur,PAW1cur,soilPsi,Transp,Erain,epsil,
                             Radlong,Radnet,Evapgrdvegorsoil,Drainage,	
                             CumPrecip,CumTransp,CumInterception,CumEvapsoil,CumDrainage,
                             Leaf,Sapwood,Stem,Branch,Root,Lai,Height,LeafSapAreaActual,LeafSapAreaTarget, 

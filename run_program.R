@@ -24,11 +24,12 @@ out <- RMATE2()
 
 
 ### process WTC met data so that it is readable in MATE
-process_WTC_met_data(inFile = "input/met_drawdownperiod_ch01.csv")
+process_WTC_met_data(inFile = "input/met_drawdownperiod_ch01.csv",
+                     outFile = "input/MATE_met_ch01.csv")
 
 ### run code modified to accommodate WTC input data and parameters
-out <- RMATE2_WTC(matefile = "input/RMATE2.csv", 
-                  outputfile = "output/RMATE2output.csv",
+out <- RMATE2_WTC(matefile = "input/MATE_met_ch01.csv", 
+                  outputfile = "output/MATE_output_ch01.csv",
                   runfrom=1, 
                   nrows=NA)
 

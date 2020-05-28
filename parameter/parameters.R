@@ -57,11 +57,11 @@ Albedo <- 0.2
 Fractup1 <- 0.6
 
 ### Canopy development
-Shootz <- 0.01
-Sapwoodz <- 0.01
-Stemz <- 0.01
-Branchz <- 0.009727332
-Rootz <- 0.01
+Shootz <- 0.125
+Sapwoodz <- 0.1
+Stemz <- 0.25
+Branchz <- 0.125
+Rootz <- 0.125
 Density <- 420
 Heighto <- 4.8295
 Htpower <- 0.34597
