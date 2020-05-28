@@ -20,8 +20,8 @@ Kext <- 0.5
 #### Light use efficiency and NPP
 Cfracts <- 0.48
 Alpha <- 0.24
-Vcmax25 <- 108.71
-Jmax25 <- 148.86
+Vcmax25 <- 97.00
+Jmax25 <- 139.33
 Theta <- 0.7
 CiCa <- 0.8
 CUE <- 0.5
@@ -34,8 +34,8 @@ Fwpmax <- 0.6
 Fwpmin <- 0.0
 Fvpmax <- 1.0
 Fvpmin <- 4.0
-Gamma <- 47.74
-Rd <- 1.44
+Gamma <- 47.88
+Rd <- 1.26
 
 
 ### Canopy development
