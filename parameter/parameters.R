@@ -1,7 +1,7 @@
 #### prepare parameter settings
 
 #### Control parameters
-FixLAI <- 0.0   ## 0 fix by input, 1 vary by carbon stock
+FixLAI <- 1.0   ## 1 fix by input, 0 vary by carbon stock
 VPDData <- 1.0
 VPDUnits <- 2.0
 OptimW <- 0.0
@@ -109,9 +109,3 @@ Rd <- 0.0
 WUEmodel <- 1.0
 WUE0 <- 15.0
 
-
-
-    
-    
-    
-    

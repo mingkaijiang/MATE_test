@@ -1,7 +1,7 @@
 RMATE2_WTC <- function(matefile, 
-                   outputfile,
-                   runfrom, 
-                   nrows){
+                       outputfile,
+                       runfrom, 
+                       nrows){
     
     #::::: Read daily data
     MATEdailydata <- read.csv(matefile)
@@ -21,41 +21,23 @@ RMATE2_WTC <- function(matefile,
     # Date in POSIXlt format
     DATES <- strptime(MATEdailydata$Date, format="%Y-%m-%d")
     
-    # Keep only first 16 columns:
-    MATEdailydata <- MATEdailydata[,1:16]
-    
-    
     # shorthand
     DD <- MATEdailydata
     
     # Declination, temperatures, VPD.
     DD$Declin <- 23.4 * pi/180*cos(2*pi/365*(DD$DOY+10)) * ifelse(Latitude<0,-1,1)
     DD$Daylen <- acos(-tan(Latitude*pi/180)*tan(DD$Declin))*24/pi
-    DD$Tam <- (DD$Tmin + DD$Tmax)/2-(DD$Tmax - DD$Tmin)/2*sqrt(2)/1.5/pi
-    DD$Tpm <- (DD$Tmin + DD$Tmax)/2+(DD$Tmax - DD$Tmin)/2*(4+2*sqrt(2))/3/pi
-    DD$Tav <- (DD$Tmin + DD$Tmax)/2
     DD$Tavday <- (DD$Tmin + DD$Tmax)/2+(DD$Tmax - DD$Tmin)/(3*pi)
     
-    DD$VPDam <- 0.61078*(exp(17.269*DD$Tav/(237.3+DD$Tav))-exp(17.269*DD$Tmin/(237.3+DD$Tmin)))*(1-sqrt(2)/1.5/pi)
-    DD$VPDpm <- 0.5*0.61078*(exp(17.269*DD$Tmax/(237.3+DD$Tmax))-exp(17.269*DD$Tmin/(237.3+DD$Tmin)))*(1+(4+2*sqrt(2))/3/pi)
     
-    DD$VPDam[DD$VPDam < 0.05] <- 0.05
-    DD$VPDpm[DD$VPDpm < 0.05] <- 0.05
-    
-    DD$VPDav <- (DD$VPDam + DD$VPDpm)/2
-    DD$GamStarAM <- Arrh(42.75,37830, DD$Tam)
-    DD$GamStarPM <- Arrh(42.75,37830, DD$Tpm)
-    DD$KmAM <- Arrh(404.9, 79430, DD$Tam)*(1+205000/Arrh(278400,36830, DD$Tam))
-    DD$KmPM <- Arrh(404.9, 79430, DD$Tpm)*(1+205000/Arrh(278400,36830, DD$Tpm))
-    DD$JmAM <- JmaxT(Jmax25,EaJ,EdJ,delSJ,DD$Tam)
-    DD$JmPM <- JmaxT(Jmax25,EaJ,EdJ,delSJ,DD$Tpm)
-    DD$VmAM <- Arrh(Vcmax25,EaV,DD$Tam)
-    DD$VmPM <- Arrh(Vcmax25,EaV,DD$Tpm)
-    
+    DD$VPD <- DD$VPDav 
+    DD$GamStar <- Arrh(42.75,37830, DD$Tav)
+    DD$Km <- Arrh(404.9, 79430, DD$Tav)*(1+205000/Arrh(278400,36830, DD$Tav))
+    DD$Jm <- JmaxT(Jmax25,EaJ,EdJ,delSJ,DD$Tav)
+    DD$Vm <- Arrh(Vcmax25,EaV,DD$Tav)
+
     # Number of simulations
     SIMROWS <- nrow(DD)
-    
-    # Note: put option here to read VPD from DailyData instead of calculating it.
     
     #::::: Initialization (only needed for vectors).
     # Note that all vectors are now filled with NA, so that they can be output if not actually calculated.
@@ -63,10 +45,7 @@ RMATE2_WTC <- function(matefile,
         TargetBranch <- Leafallocn <- Branchallocn <- Stemallocn <- TotalAlloc <- Leafturnoverrate <- Stemvol <- 
         rep(NA, SIMROWS)
     
-    Fabs <- APAR <- fPAW <- fVPDam <- fVPDpm <- soilPsi <- leafPsiam <- leafPsipm <- fPAWam <- fPAWpm <-
-        PAWcur <- TranspAM <- TranspPM <- m <- CiCaAM <- CiCaPM <- CiCaAv <- 
-        Gsam <- Gspm <- AcAM <- AcPM <- AjAM <- AjPM <- 
-        AsatAM <- AsatPM <- LUEAM <- LUEPM <- LUE <-
+    Fabs <- APAR <- fPAW <- fVPD <- soilPsi <- leafPsi <- fPAW <- PAWcur <- Transp <- m <- CiCa <- CiCaAv <- Gs <- Ac <- Aj <- Asat <- LUE <-
         LUE1000 <- LUEgCMJPAR <- NPPtCha <- NPPgCm2 <- CumNPP <- CumAPAR <- LAIgrass <- Fabsgrass <- 
         APARgrass <- fPAWgrass <- fVPDgrass  <- LUEgrass <- NPPtChagrass <- NPPgCm2grass <- totalNPP <-
         CumNPPgrass <- CumtotalNPP <- rep(NA, SIMROWS)
@@ -112,34 +91,24 @@ RMATE2_WTC <- function(matefile,
         APAR[i] <- DD$Radtot[i] * Fabs[i] * 2
         
         # fVPD is not actually used.
-        fVPDam[i] <- ifelse(OptimV==0,
-                            max(0,min(1,(Fvpmin-DD$VPDam[i])/(Fvpmin-Fvpmax))),
-                            1)
-        fVPDpm[i] <- ifelse(OptimV==0,
-                            max(0,min(1,(Fvpmin-DD$VPDpm[i])/(Fvpmin-Fvpmax))),
-                            1)
+        fVPD[i] <- ifelse(OptimV==0,
+                          max(0,min(1,(Fvpmin-DD$VPD[i])/(Fvpmin-Fvpmax))),
+                          1)
         
         # JEES-MATE
         if(mateoption == 1){
-            leafPsiam[i] <- LeafPsi(soilPsi[i],ksr,Gsmax*fVPDam[i]*DD$VPDam[i]/100,phiLmin,phiLmax)
-            leafPsipm[i] <- LeafPsi(soilPsi[i],ksr,Gsmax*fVPDpm[i]*DD$VPDpm[i]/100,phiLmin,phiLmax)
-            fPAWam[i] <- max(0,min(1,(leafPsiam[i]-phiLmin)/(phiLmax-phiLmin)))
-            fPAWpm[i] <- max(0,min(1,(leafPsipm[i]-phiLmin)/(phiLmax-phiLmin)))
-            
-            Gsam[i] <- Gsmax*fPAWam[i]*fVPDam[i]/1000
-            Gspm[i] <- Gsmax*fPAWpm[i]*fVPDpm[i]/1000
-            
-            AcAM[i] <- SolveQuad(Gsam[i]/1.6,DD$VmAM[i],DD$Ca[i],DD$GamStarAM[i],DD$KmAM[i])		
-            AcPM[i] <- SolveQuad(Gspm[i]/1.6,DD$VmPM[i],DD$Ca[i],DD$GamStarPM[i],DD$KmPM[i])
-            AjAM[i] <- SolveQuad(Gsam[i]/1.6,DD$JmAM[i]/4,DD$Ca[i],DD$GamStarAM[i],2*DD$GamStarAM[i])
-            AjPM[i] <- SolveQuad(Gspm[i]/1.6,DD$JmPM[i]/4,DD$Ca[i],DD$GamStarPM[i],2*DD$GamStarPM[i])
-            
-            AsatAM[i] <- ifelse(Gsam[i]==0, 0, min(AjAM[i], AcAM[i]))
-            AsatPM[i] <- ifelse(Gspm[i]==0, 0, min(AjPM[i], AcPM[i]))
-            
-            LUEAM[i] <- Epsilon(Alpha*fPAWam[i],AsatAM[i],Kext,DD$Radtot[i], Theta, DD$Daylen[i])
-            LUEPM[i] <- Epsilon(Alpha*fPAWpm[i],AsatPM[i],Kext,DD$Radtot[i], Theta, DD$Daylen[i])
-            
+            leafPsi[i] <- LeafPsi(soilPsi[i],ksr,Gsmax*fVPD[i]*DD$VPD[i]/100,phiLmin,phiLmax)
+            fPAW[i] <- max(0,min(1,(leafPsi[i]-phiLmin)/(phiLmax-phiLmin)))
+
+            Gs[i] <- Gsmax*fPAW[i]*fVPD[i]/1000
+
+            Ac[i] <- SolveQuad(Gs[i]/1.6,DD$Vm[i],DD$Ca[i],DD$GamStar[i],DD$Km[i])		
+            Aj[i] <- SolveQuad(Gs[i]/1.6,DD$Jm[i]/4,DD$Ca[i],DD$GamStar[i],2*DD$GamStar[i])
+
+            AsatAM[i] <- ifelse(Gs[i]==0, 0, min(Aj[i], Ac[i]))
+
+            LUE[i] <- Epsilon(Alpha*fPAW[i],Asat[i],Kext,DD$Radtot[i], Theta, DD$Daylen[i])
+
         }
         
         # ROSS-MATE
@@ -151,36 +120,29 @@ RMATE2_WTC <- function(matefile,
             
             # Different options for ci/ca model.
             if(cicamodel==1){
-                CiCaAM[i] <- CiDivCa(DD$Ca[i],Gamma,m[i],DD$VPDam[i],LeuningDo)
-                CiCaPM[i] <- CiDivCa(DD$Ca[i],Gamma,m[i],DD$VPDpm[i],LeuningDo)
+                CiCa[i] <- CiDivCa(DD$Ca[i],Gamma,m[i],DD$VPD[i],LeuningDo)
             }
             if(cicamodel==2){
-                CiCaAM[i] <- 1-sqrt((1.6*(DD$VPDam[i]/101) * (DD$Ca[i]-optimlambda) )/(optimlambda*DD$Ca[i]^2))
-                CiCaPM[i] <- 1-sqrt((1.6*(DD$VPDpm[i]/101) * (DD$Ca[i]-optimlambda) )/(optimlambda*DD$Ca[i]^2))
+                CiCa[i] <- 1-sqrt((1.6*(DD$VPD[i]/101) * (DD$Ca[i]-optimlambda) )/(optimlambda*DD$Ca[i]^2))
             }
-            CiCaAv[i] <- (CiCaAM[i] + CiCaPM[i])/2
+            CiCaAv[i] <- CiCa[i] #(CiCaAM[i] + CiCaPM[i])/2
             
             # Vcmax limited assimilation rate
-            AcAM[i] <- max(0,(DD$Ca[i]*CiCaAM[i] - DD$GamStarAM[i]))/(DD$Ca[i]*CiCaAM[i]+ DD$KmAM[i])*DD$VmAM[i]
-            AcPM[i] <- max(0,(DD$Ca[i]*CiCaPM[i] - DD$GamStarPM[i]))/(DD$Ca[i]*CiCaPM[i]+ DD$KmPM[i])*DD$VmPM[i]
-            
+            Ac[i] <- max(0,(DD$Ca[i]*CiCa[i] - DD$GamStar[i]))/(DD$Ca[i]*CiCa[i]+ DD$Km[i])*DD$Vm[i]
+
             # Jmax limited (at light saturation)
-            AjAM[i] <- (DD$JmAM[i]/4) * ((DD$Ca[i]*CiCaAM[i] - DD$GamStarAM[i])/(DD$Ca[i]*CiCaAM[i] + 2*DD$GamStarAM[i]))
-            AjPM[i] <- (DD$JmPM[i]/4) * ((DD$Ca[i]*CiCaPM[i] - DD$GamStarPM[i])/(DD$Ca[i]*CiCaPM[i] + 2*DD$GamStarPM[i]))
-            
+            Aj[i] <- (DD$Jm[i]/4) * ((DD$Ca[i]*CiCa[i] - DD$GamStar[i])/(DD$Ca[i]*CiCa[i] + 2*DD$GamStar[i]))
+
             # Note that these are gross photosynthetic rates.
-            AsatAM[i] <- min(AjAM[i], AcAM[i])
-            AsatPM[i] <- min(AjPM[i], AcPM[i])
-            
+            Asat[i] <- min(Aj[i], Ac[i])
+
             # LUE
-            LUEAM[i] <- Epsilon(Alpha,AsatAM[i],Kext,DD$Radtot[i], Theta, DD$Daylen[i])
-            LUEPM[i] <- Epsilon(Alpha,AsatPM[i],Kext,DD$Radtot[i], Theta, DD$Daylen[i])
-            
+            LUE[i] <- Epsilon(Alpha,Asat[i],Kext,DD$Radtot[i], Theta, DD$Daylen[i])
+
         }
         
         # mol C mol-1 PAR
-        LUE[i] <- (LUEAM[i] + LUEPM[i])/2
-        
+
         # Obsolete: was for drawing graphs in Excel-MATE
         LUE1000[i] <- 1000*LUE[i] 
         
@@ -205,7 +167,7 @@ RMATE2_WTC <- function(matefile,
         # Optional grass layer
         LAIgrass[i] <- LAI2
         Fabsgrass[i] <- 1-exp(-Kext2*LAI2)
-        APARgrass[i] <- Fabsgrass[i]*(DD$Radtot[i] - APAR[i])
+        APARgrass[i] <- Fabsgrass[i]*(DD$Radtot[i]- APAR[i])
         fPAWgrass[i] <- min(1, max(0,(PAWcur[i]/Wcapac1-Fwgmin)/(Fwgmax-Fwgmin)))
         fVPDgrass[i] <- max(0, min(1,(Fvgmin - DD$VPDav)/(Fvgmin-Fvgmax)))
         LUEgrass[i] <- LUE2*fPAWgrass[i]*fVPDgrass[i]
@@ -217,13 +179,9 @@ RMATE2_WTC <- function(matefile,
         
         # JEES-MATE
         if(mateoption == 1){
-            TranspAM[i] <- ifelse(AsatAM[i]>0,
-                                  Gsam[i]*LUEAM[i]*APAR[i]/2/AsatAM[i]*18*10^3*DD$VPDam[i]/100,
+            Transp[i] <- ifelse(Asat[i]>0,
+                                  Gs[i]*LUE[i]*APAR[i]/2/Asat[i]*18*10^3*DD$VPD[i]/100,
                                   0)
-            TranspPM[i] <- ifelse(AsatPM[i]>0,
-                                  Gspm[i]*LUEPM[i]*APAR[i]/2/AsatPM[i]*18*10^3*DD$VPDpm[i]/100,
-                                  0)
-            Transp[i] <- (TranspAM[i]+TranspPM[i])
         }
         # ROSS-MATE	
         if(mateoption == 0){
@@ -310,8 +268,8 @@ RMATE2_WTC <- function(matefile,
     
     # Dataframe with all the results
     returndfr <- data.frame(Date=as.character(DATES),Year=DATES$year+1900,Month=DATES$mon+1,Day=DATES$mday,
-                            DOY=DATES$yday+1,Fabs,APAR,fPAWam,fPAWpm,fVPDam,fVPDpm,Gsam,Gspm,leafPsiam,leafPsipm,
-                            AjAM,AjPM,AcAM,AcPM,AsatAM,AsatPM,LUEAM,LUEPM,LUE,
+                            DOY=DATES$yday+1,Fabs,APAR,fPAW,
+                            fVPD, Gs, leafPsi, Aj, Ac, Asat, LUE,
                             LUE1000,LUEgCMJPAR,NPPtCha,NPPgCm2,CumNPP,CumAPAR,LAIgrass,Fabsgrass,
                             APARgrass,fPAWgrass,fVPDgrass,LUEgrass,NPPtChagrass,NPPgCm2grass,totalNPP,
                             CumNPPgrass,CumtotalNPP,PAWcur,PAW1cur,soilPsi,TranspAM,TranspPM,Transp,Erain,epsil,

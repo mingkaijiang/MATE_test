@@ -22,6 +22,10 @@ source("parameter/parameters.R")
 out <- RMATE2()
 
 
+
+### process WTC met data so that it is readable in MATE
+process_WTC_met_data(inFile = "input/met_drawdownperiod_ch01.csv")
+
 ### run code modified to accommodate WTC input data and parameters
 out <- RMATE2_WTC(matefile = "input/RMATE2.csv", 
                   outputfile = "output/RMATE2output.csv",
@@ -29,19 +33,7 @@ out <- RMATE2_WTC(matefile = "input/RMATE2.csv",
                   nrows=NA)
 
 
-#### run sensitivity test
-#rundfr <- expand.grid(#Ca=c(380,620), 
-#                      Wcapac=c(60,80,100,120,140,160,180,200))
-#rundfr$PAW0 <- rundfr$Wcapac
-#res1 <- RMATEsensitivity(rundfr)
-#
-#rundfr$NPP <- sapply(res1, function(x)mean(x$NPPtCha))
-#rundfr$m <- sapply(res1, function(x)mean(x$m))
-#rundfr$PAW <- sapply(res1, function(x)mean(x$PAWcur))
 
-# example
-#with(rundfr, plot(PAW0, PAW, pch=19, col=as.factor(Ca)))
-#legend("bottomright",levels(as.factor(rundfr$Ca)),pch=19,col=as.factor(Ca))
 
 ################################### end run MATE ######################################
 #######################################################################################
