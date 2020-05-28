@@ -1,7 +1,5 @@
 process_WTC_met_data <- function(inFile, outFile) {
     
-    inFile = "input/met_drawdownperiod_ch02.csv"
-    
     ### input
     inDF <- read.csv(inFile)
     
