@@ -1,7 +1,11 @@
 RMATE2_WTC <- function(matefile, 
                        outputfile,
+                       sourcefile,
                        runfrom, 
                        nrows){
+    
+    ### read in parameters
+    source(sourcefile)
     
     #::::: Read daily data
     MATEdailydata <- read.csv(matefile)
