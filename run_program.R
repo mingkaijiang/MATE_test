@@ -16,7 +16,7 @@ source("prepare.R")
 #######################################################################################
 ################################### run MATE ##########################################
 ### run basic code
-out <- RMATE2()
+#out <- RMATE2()
 
 
 
@@ -69,5 +69,17 @@ out08 <- RMATE2_WTC(matefile = "input/MATE_met_ch08.csv",
                     nrows=NA)
 
 
+### run road map MATE
+out.roadmap <- RMATE2_WTC(matefile = "input/MATE_met_ch01.csv", 
+                          outputfile = "output/MATE_output_roadmap.csv",
+                          sourcefile = "parameter/parameters_roadmap.R",
+                          runfrom=1, 
+                          nrows=NA)
+
+
 ################################### end run MATE ######################################
 #######################################################################################
+
+### check roadmap result CO2 sensitivity
+check_roadmap_result_CO2_sensitivity()
+

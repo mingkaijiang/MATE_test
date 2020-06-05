@@ -19,9 +19,9 @@ Kext <- 0.5
 
 #### Light use efficiency and NPP
 Cfracts <- 0.48
-Alpha <- 0.24
-Vcmax25 <- 97.00
-Jmax25 <- 139.33
+Alpha <- 0.24    # 0.05
+Vcmax25 <- 97.00 # 82
+Jmax25 <- 139.33 # 191
 Theta <- 0.7
 CiCa <- 0.8
 CUE <- 0.5

@@ -12,7 +12,7 @@ cicamodel <- 1.0   # 1 = Leuning
 
 WUEmodel <- 1.0    # 1 = based on Ci/Ca
 
-Latitude <- -35
+Latitude <- -33.62
 LAIcover <- 0.5
 Kext <- 0.5
 
@@ -34,7 +34,8 @@ Fwpmax <- 0.6
 Fwpmin <- 0.0
 Fvpmax <- 1.0
 Fvpmin <- 4.0
-
+Gamma <- 54.5
+Rd <- 0.0
 
 ### Canopy development
 Shootz <- 1.25   # initial leaf carbon biomass (t/ha)
@@ -82,8 +83,6 @@ Leuningm1 <- 4.0
 Leuningmo <- 1.0
 LeuningDo <- 6.0
 PAWcrit <- 100.0
-Gamma <- 54.5
-Rd <- 0.0
 WUE0 <- 15.0
 
 ### Water balance
