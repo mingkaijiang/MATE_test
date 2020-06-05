@@ -14,7 +14,8 @@ pacman::p_load(dplyr,
                scales,
                data.table,
                xlsReadWrite,
-               gdata)    
+               gdata,
+               ggthemes)    
 
 
 #### Sourcing all R files in the modules subdirectory
