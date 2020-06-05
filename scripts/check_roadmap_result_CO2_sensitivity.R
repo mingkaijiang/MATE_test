@@ -4,14 +4,16 @@ check_roadmap_result_CO2_sensitivity <- function() {
     inDF1 <- read.csv("output/MATE_output_original.csv")
     inDF2 <- read.csv("output/MATE_output_roadmap_vcmax45.csv")
     inDF3 <- read.csv("output/MATE_output_roadmap_vcmax60.csv")
+    inDF4 <- read.csv("output/MATE_output_roadmap_jv15.csv")
     
     ### labeling
     inDF1$lab <- "original"
     inDF2$lab <- "vcmax45"
     inDF3$lab <- "vcmax60"
+    inDF4$lab <- "jv15"
     
     ### merge and subset
-    myDF <- rbind(inDF1, inDF2, inDF3)
+    myDF <- rbind(inDF1, inDF2, inDF3, inDF4)
     subDF <- subset(myDF, Ca>=300&Ca<=700)
     
     lm1 <- lm(Asat~Ca, subDF[subDF$lab == "original",])
@@ -26,7 +28,11 @@ check_roadmap_result_CO2_sensitivity <- function() {
     lm8 <- lm(Ac~Ca, subDF[subDF$lab == "vcmax60",])
     lm9 <- lm(Aj~Ca, subDF[subDF$lab == "vcmax60",])
     
-    plotDF <- data.frame(c("original", "vcmax45", "vcmax60"),
+    lm10 <- lm(Asat~Ca, subDF[subDF$lab == "jv15",])
+    lm11 <- lm(Ac~Ca, subDF[subDF$lab == "jv15",])
+    lm12 <- lm(Aj~Ca, subDF[subDF$lab == "jv15",])
+    
+    plotDF <- data.frame(c("original", "vcmax45", "vcmax60", "jv15"),
                          NA, NA, NA, NA, NA, NA, NA, NA, NA)
     colnames(plotDF) <- c("lab", "A400", "A600", "A_sens",
                           "Ac400", "Ac600", "Ac_sens",
@@ -63,6 +69,17 @@ check_roadmap_result_CO2_sensitivity <- function() {
     plotDF$Aj600[plotDF$lab=="vcmax60"] <- 600 * coef(lm9)[2] + coef(lm9)[1]
     
     
+    ### JV 1.5
+    plotDF$A400[plotDF$lab=="jv15"] <- 400 * coef(lm10)[2] + coef(lm10)[1]
+    plotDF$A600[plotDF$lab=="jv15"] <- 600 * coef(lm10)[2] + coef(lm10)[1]
+    
+    plotDF$Ac400[plotDF$lab=="jv15"] <- 400 * coef(lm11)[2] + coef(lm11)[1]
+    plotDF$Ac600[plotDF$lab=="jv15"] <- 600 * coef(lm11)[2] + coef(lm11)[1]
+    
+    plotDF$Aj400[plotDF$lab=="jv15"] <- 400 * coef(lm12)[2] + coef(lm12)[1]
+    plotDF$Aj600[plotDF$lab=="jv15"] <- 600 * coef(lm12)[2] + coef(lm12)[1]
+    
+    
     ### sensitivity
     plotDF$A_sens <- with(plotDF, A600/A400)
     plotDF$Ac_sens <- with(plotDF, Ac600/Ac400)
@@ -81,6 +98,8 @@ check_roadmap_result_CO2_sensitivity <- function() {
     
     plotDF <- rbind(subDF1, subDF2, subDF3)
     
+    
+    ### plotting
     p1 <- ggplot(data=plotDF, 
                  aes(lab1, ratio, group=lab2)) +
         geom_bar(stat = "identity", aes(fill=lab2), 
@@ -106,10 +125,11 @@ check_roadmap_result_CO2_sensitivity <- function() {
                                    expression(paste(A[j]))),
                           values = colorblind_pal()(3 + 1)[-1])+
         xlab("")+
-        scale_x_discrete(breaks=c("original", "vcmax45", "vcmax60"),
+        scale_x_discrete(breaks=c("original", "vcmax45", "vcmax60", "jv15"),
                          labels=c(expression(paste(V[cmax91])),
                                   expression(paste(V[cmax45])),
-                                  expression(paste(V[cmax60]))))+
+                                  expression(paste(V[cmax60])),
+                                  expression(paste(JV[1.5]))))+
         coord_cartesian(ylim = c(1, 1.5))
     
     plot(p1)

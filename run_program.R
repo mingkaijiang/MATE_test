@@ -88,6 +88,12 @@ out.roadmap.vcmax60 <- RMATE2_WTC(matefile = "input/MATE_met_ch01.csv",
                                   runfrom=1, 
                                   nrows=NA)
 
+out.roadmap.jv1.5 <- RMATE2_WTC(matefile = "input/MATE_met_ch01.csv", 
+                                outputfile = "output/MATE_output_roadmap_jv15.csv",
+                                sourcefile = "parameter/parameters_roadmap_jv15.R",
+                                runfrom=1, 
+                                nrows=NA)
+
 
 ################################### end run MATE ######################################
 #######################################################################################
