@@ -70,11 +70,23 @@ out08 <- RMATE2_WTC(matefile = "input/MATE_met_ch08.csv",
 
 
 ### run road map MATE
-out.roadmap <- RMATE2_WTC(matefile = "input/MATE_met_ch01.csv", 
-                          outputfile = "output/MATE_output_roadmap.csv",
-                          sourcefile = "parameter/parameters_roadmap.R",
+out.original <- RMATE2_WTC(matefile = "input/MATE_met_ch01.csv", 
+                          outputfile = "output/MATE_output_original.csv",
+                          sourcefile = "parameter/parameters_original.R",
                           runfrom=1, 
                           nrows=NA)
+
+out.roadmap.vcmax45 <- RMATE2_WTC(matefile = "input/MATE_met_ch01.csv", 
+                                  outputfile = "output/MATE_output_roadmap_vcmax45.csv",
+                                  sourcefile = "parameter/parameters_roadmap_vcmax45.R",
+                                  runfrom=1, 
+                                  nrows=NA)
+
+out.roadmap.vcmax60 <- RMATE2_WTC(matefile = "input/MATE_met_ch01.csv", 
+                                  outputfile = "output/MATE_output_roadmap_vcmax60.csv",
+                                  sourcefile = "parameter/parameters_roadmap_vcmax60.R",
+                                  runfrom=1, 
+                                  nrows=NA)
 
 
 ################################### end run MATE ######################################
