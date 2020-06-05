@@ -13,7 +13,7 @@ pacman::p_load(dplyr,
                viridis,
                scales,
                data.table,
-               xlsReadWrite,
+               #xlsReadWrite,
                gdata,
                ggthemes)    
 

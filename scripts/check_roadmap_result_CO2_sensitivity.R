@@ -132,7 +132,7 @@ check_roadmap_result_CO2_sensitivity <- function() {
                                   expression(paste(JV[1.5]))))+
         coord_cartesian(ylim = c(1, 1.5))
     
-    plot(p1)
+   #plot(p1)
     
     pdf("output/relative_contribution_Ac_Aj_sensitivity_test.pdf", width=4, height=4)
     plot(p1)

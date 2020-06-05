@@ -110,7 +110,7 @@ RMATE2_WTC <- function(matefile,
             Aj[i] <- SolveQuad(Gs[i]/1.6,DD$Jm[i]/4,DD$Ca[i],DD$GamStar[i],2*DD$GamStar[i])
 
             AsatAM[i] <- ifelse(Gs[i]==0, 0, min(Aj[i], Ac[i]))
-
+            
             LUE[i] <- Epsilon(Alpha*fPAW[i],Asat[i],Kext,DD$Radtot[i], Theta, DD$Daylen[i])
 
         }
@@ -129,7 +129,7 @@ RMATE2_WTC <- function(matefile,
             if(cicamodel==2){
                 CiCa[i] <- 1-sqrt((1.6*(DD$VPD[i]/101) * (DD$Ca[i]-optimlambda) )/(optimlambda*DD$Ca[i]^2))
             }
-            CiCaAv[i] <- CiCa[i] #(CiCaAM[i] + CiCaPM[i])/2
+            CiCaAv[i] <- CiCa[i] 
             
             # Vcmax limited assimilation rate
             Ac[i] <- max(0,(DD$Ca[i]*CiCa[i] - DD$GamStar[i]))/(DD$Ca[i]*CiCa[i]+ DD$Km[i])*DD$Vm[i]
@@ -140,6 +140,9 @@ RMATE2_WTC <- function(matefile,
             # Note that these are gross photosynthetic rates.
             Asat[i] <- min(Aj[i], Ac[i])
 
+            ### Quantum efficiency
+            Alpha <- calculate_quantum_efficiency(CiCaAv[i], DD$Ca[i], DD$GamStar[i])
+            
             # LUE
             LUE[i] <- Epsilon(Alpha,Asat[i],Kext,DD$Radtot[i], Theta, DD$Daylen[i])
 
